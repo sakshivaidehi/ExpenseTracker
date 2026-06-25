@@ -2,11 +2,51 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// export const signup = async (req, res) => {
+//     const { name, email, password } = req.body;
+//     const hash = await bcrypt.hash(password, 10);
+//     const user = await User.create({ name, email, password: hash });
+//     res.json({ message: "User Registered" });
+// };
+
 export const signup = async (req, res) => {
-    const { name, email, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hash });
-    res.json({ message: "User Registered" });
+    try {
+        console.log("Signup body:", req.body);
+
+        const { name, email, password } = req.body;
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: "Email already exists"
+            });
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            name,
+            email,
+            password: hash
+        });
+
+        console.log("User created:", user);
+
+        res.status(201).json({
+            success: true,
+            message: "User Registered"
+        });
+
+    } catch (error) {
+        console.log("SIGNUP ERROR:", error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 };
 
 export const login = async (req, res) => {

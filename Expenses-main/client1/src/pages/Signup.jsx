@@ -38,9 +38,15 @@ export default function Signup() {
             alert("Account created successfully ✔ Please login.");
             navigate("/login"); // fallback to login
         } catch (err) {
-            console.log("Signup error:", err);
-            alert("Signup failed, maybe email already used!");
-        } finally {
+    console.log("Signup error:", err);
+    console.log("Response:", err.response?.data);
+
+    alert(
+        err.response?.data?.message ||
+        err.message ||
+        "Signup failed"
+    );
+} finally {
             setLoading(false);
         }
     };
